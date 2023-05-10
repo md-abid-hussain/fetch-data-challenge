@@ -1,23 +1,47 @@
-import logo from './logo.svg';
-import './App.css';
+import { useState } from 'react';
+import { useEffect } from 'react';
+import Form from './Form'
+import Table from './Table';
+
 
 function App() {
+  const API_URL = 'https://jsonplaceholder.typicode.com'
+
+  const [data, setdata] = useState([]);
+  const [isLoading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState(false);
+  const [currentData, setCurrentData] = useState('users');
+
+  useEffect(() => {
+    setLoading(true)
+    setFetchError(false)
+    setdata([])
+    const fetchItems = async () => {
+      try {
+        const reqURL = `${API_URL}/${currentData}`
+        const response = await fetch(reqURL);
+        if (!response.ok) {
+          throw new Error('Please reload the application')
+        }
+        const listItems = await response.json();
+        setdata(listItems)
+        setFetchError(null)
+      } catch (err) {
+        setFetchError(err.message)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    setTimeout(() => {
+      (async () => await fetchItems())();
+    }, 2000);
+  }, [currentData])
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Form currentData={currentData} setCurrentData={setCurrentData} />
+      {isLoading ? <p>Loading...</p> : !fetchError ? <Table data={data} /> : <p style={{ color: 'red' }}>Error loading data</p>}
     </div>
   );
 }
