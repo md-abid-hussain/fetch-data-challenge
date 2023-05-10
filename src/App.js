@@ -13,6 +13,10 @@ function App() {
   const [currentData, setCurrentData] = useState('users');
 
   useEffect(() => {
+    document.title = 'Fetch Details'
+  }, [])
+
+  useEffect(() => {
     setLoading(true)
     setFetchError(false)
     setdata([])
